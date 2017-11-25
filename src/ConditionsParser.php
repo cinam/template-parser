@@ -2,20 +2,21 @@
 
 namespace Cinam\TemplateParser;
 
+use Cinam\TemplateParser\Exception\InvalidSyntaxException;
+
 class ConditionsParser
 {
 
     public function parse($text)
     {
         // can it be removed?
-        if (strpos($text, '[IF ') === false) {
+        if (strpos($text, '[IF ') === false && strpos($text, '[ENDIF]') === false) {
             return $text;
         }
 
         $ifIndexes = $this->getIfIndexesForCurrentDepth($text);
         $ifStarts = $ifIndexes[0];
         $ifEnds = $ifIndexes[1];
-        $this->validateStartsAndEnds($ifStarts, $ifEnds);
 
         $result = substr($text, 0, $ifStarts[0]);
 
@@ -68,23 +69,18 @@ class ConditionsParser
                 }
             }
 
-//            if ($currentDepth < 0) {
-//                error
-//            }
+            if ($currentDepth < 0) {
+                throw new InvalidSyntaxException();
+            }
         }
 
-//        if ($currentDepth !== 0) {
-//            error
-//        }
+        if ($currentDepth !== 0) {
+            throw new InvalidSyntaxException();
+        }
 
         return [
             $starts,
             $ends,
         ];
-    }
-
-    private function validateStartsAndEnds(array $starts, array $ends)
-    {
-        // todo
     }
 }

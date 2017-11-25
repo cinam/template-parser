@@ -27,6 +27,8 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
     {
         $text = 'begin middle end';
         $this->assertEquals('begin middle end', $this->parser->parse($text));
+        $text = '[if 1]foo[endif]';
+        $this->assertEquals($text, $this->parser->parse($text));
     }
 
     /**
@@ -116,5 +118,27 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @dataProvider providerSyntaxError
+     * @expectedException Cinam\TemplateParser\Exception\InvalidSyntaxException
+     */
+    public function testSyntaxError($input)
+    {
+        $this->parser->parse($input);
+    }
+
+    public function providerSyntaxError()
+    {
+        return [
+            ['[IF 1]foo'],
+            ['foo[ENDIF]'],
+            ['[IF 1]foo[ENDIF] [ENDIF]'],
+            ['[IF 1]foo[ENDIF] [IF 1]'],
+            ['[IF 1] [IF 1]foo[ENDIF]'],
+            ['[ENDIF] [IF 1]foo[ENDIF]'],
+            ['[if 1]foo[ENDIF]'],
+            ['[IF 1]foo[endif]'],
+        ];
+    }
 }
 
