@@ -49,6 +49,11 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['begin [IF 1]one[ENDIF] middle [IF 0]two[ENDIF] end', 'begin one middle  end'],
             ['begin [IF 0]one[ENDIF] middle [IF 1]two[ENDIF] end', 'begin  middle two end'],
             ['begin [IF 0]one[ENDIF] middle [IF 0]two[ENDIF] end', 'begin  middle  end'],
+
+            // three ifs
+            ['begin [IF 1]one[ENDIF] middle [IF 1]two[ENDIF] middle2 [IF 1]three[ENDIF] end', 'begin one middle two middle2 three end'],
+            ['begin [IF 1]one[ENDIF] middle [IF 0]two[ENDIF] middle2 [IF 1]three[ENDIF] end', 'begin one middle  middle2 three end'],
+            ['begin [IF 0]one[ENDIF] middle [IF 1]two[ENDIF] middle2 [IF 0]three[ENDIF] end', 'begin  middle two middle2  end'],
         ];
     }
 }
