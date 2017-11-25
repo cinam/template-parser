@@ -29,28 +29,27 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('begin middle end', $this->parser->parse($text));
     }
 
-    public function testSimpleIf()
+    /**
+     * @dataProvider providerOneLevelIfs
+     */
+    public function testOneLevelIfs($input, $expected)
     {
-        $text = 'begin [IF 1]one[ENDIF] end';
-        $this->assertEquals('begin one end', $this->parser->parse($text));
-
-        $text2 = 'begin [IF 0]two[ENDIF] end';
-        $this->assertEquals('begin  end', $this->parser->parse($text2));
+        $this->assertEquals($expected, $this->parser->parse($input));
     }
 
-    public function testTwoIfs()
+    public function providerOneLevelIfs()
     {
-        $text = 'begin [IF 1]one[ENDIF] middle [IF 1]two[ENDIF] end';
-        $this->assertEquals('begin one middle two end', $this->parser->parse($text));
+        return [
+            // one if
+            ['begin [IF 1]one[ENDIF] end', 'begin one end'],
+            ['begin [IF 0]one[ENDIF] end', 'begin  end'],
 
-        $text = 'begin [IF 1]one[ENDIF] middle [IF 0]two[ENDIF] end';
-        $this->assertEquals('begin one middle  end', $this->parser->parse($text));
-
-        $text = 'begin [IF 0]one[ENDIF] middle [IF 1]two[ENDIF] end';
-        $this->assertEquals('begin  middle two end', $this->parser->parse($text));
-    
-        $text = 'begin [IF 0]one[ENDIF] middle [IF 0]two[ENDIF] end';
-        $this->assertEquals('begin  middle  end', $this->parser->parse($text));
+            // two ifs
+            ['begin [IF 1]one[ENDIF] middle [IF 1]two[ENDIF] end', 'begin one middle two end'],
+            ['begin [IF 1]one[ENDIF] middle [IF 0]two[ENDIF] end', 'begin one middle  end'],
+            ['begin [IF 0]one[ENDIF] middle [IF 1]two[ENDIF] end', 'begin  middle two end'],
+            ['begin [IF 0]one[ENDIF] middle [IF 0]two[ENDIF] end', 'begin  middle  end'],
+        ];
     }
 }
 
