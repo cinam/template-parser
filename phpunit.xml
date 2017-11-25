@@ -4,6 +4,6 @@
     colors = "true"
     verbose = "true"
     debug = "true"
-    bootstrap ="../vendor/autoload.php"
+    bootstrap ="vendor/autoload.php"
     >
 </phpunit>
