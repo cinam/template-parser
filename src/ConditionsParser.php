@@ -12,8 +12,9 @@ class ConditionsParser
             return $text;
         }
 
-        $ifStarts = $this->getIfStarts($text);
-        $ifEnds = $this->getIfEnds($text);
+        $ifIndexes = $this->getIfIndexesForCurrentDepth($text);
+        $ifStarts = $ifIndexes[0];
+        $ifEnds = $ifIndexes[1];
         $this->validateStartsAndEnds($ifStarts, $ifEnds);
 
         $result = substr($text, 0, $ifStarts[0]);
@@ -42,43 +43,44 @@ class ConditionsParser
             $result = substr($text, $ifContentPosition, $endifPosition - $ifContentPosition);
         }
 
-        return $result;
+        return $this->parse($result);
     }
 
-    private function getIfStarts($text)
+    private function getIfIndexesForCurrentDepth($text)
     {
-        $result = [];
-        $offset = 0;
-        $stop = false;
-        while (!$stop) {
-            $position = strpos($text, '[IF ', $offset);
-            if ($position !== false) {
-                $result[] = $position;
-                $offset = $position + 1;
-            } else {
-                $stop = true;
+        $starts = [];
+        $ends = [];
+
+        $currentDepth = 0;
+        $cnt = strlen($text);
+        for ($i = 0; $i < $cnt; $i++) {
+            if (substr($text, $i, 4) === '[IF ') {
+                if ($currentDepth === 0) {
+                    $starts[] = $i;
+                }
+
+                ++ $currentDepth;
+            } elseif (substr($text, $i, 7) === '[ENDIF]') {
+                -- $currentDepth;
+
+                if ($currentDepth === 0) {
+                    $ends[] = $i + 6; // last letter of "[ENDIF]"
+                }
             }
+
+//            if ($currentDepth < 0) {
+//                error
+//            }
         }
 
-        return $result;
-    }
+//        if ($currentDepth !== 0) {
+//            error
+//        }
 
-    private function getIfEnds($text)
-    {
-        $result = [];
-        $offset = 0;
-        $stop = false;
-        while (!$stop) {
-            $position = strpos($text, '[ENDIF]', $offset);
-            if ($position !== false) {
-                $result[] = $position + 6;
-                $offset = $position + 1;
-            } else {
-                $stop = true;
-            }
-        }
-
-        return $result;
+        return [
+            $starts,
+            $ends,
+        ];
     }
 
     private function validateStartsAndEnds(array $starts, array $ends)
