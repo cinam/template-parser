@@ -56,5 +56,22 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['begin [IF 0]one[ENDIF] middle [IF 1]two[ENDIF] middle2 [IF 0]three[ENDIF] end', 'begin  middle two middle2  end'],
         ];
     }
+
+    /**
+     * @dataProvider providerOneLevelBorderCases
+     */
+    public function testOneLevelBorderCases($input, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($input));
+    }
+
+    public function providerOneLevelBorderCases()
+    {
+        return [
+            ['[IF 1]one[ENDIF]', 'one'],
+            ['[IF 0]one[ENDIF]', ''],
+            ['[IF 1]one[ENDIF][IF 1] two[ENDIF][IF 0] three[ENDIF]', 'one two'],
+        ];
+    }
 }
 
