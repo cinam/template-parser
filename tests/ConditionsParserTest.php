@@ -97,5 +97,24 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 0]foo [IF 0]bar[ENDIF][ENDIF]', ''],
         ];
     }
+
+    /**
+     * @dataProvider providerThreeLevels
+     */
+    public function testThreeLevels($input, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($input));
+    }
+
+    public function providerThreeLevels()
+    {
+        return [
+            ['[IF 1]foo [IF 1]bar [IF 1]baz[ENDIF][ENDIF][ENDIF]', 'foo bar baz'],
+            ['[IF 1]foo [IF 1]bar [IF 0]baz[ENDIF][ENDIF][ENDIF]', 'foo bar '],
+            ['[IF 1]foo [IF 0]bar [IF 1]baz[ENDIF][ENDIF][ENDIF]', 'foo '],
+            ['[IF 0]foo [IF 1]bar [IF 1]baz[ENDIF][ENDIF][ENDIF]', ''],
+        ];
+    }
+
 }
 
