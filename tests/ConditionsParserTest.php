@@ -4,7 +4,7 @@ namespace Cinam\TemplateParser\Tests;
 
 use Cinam\TemplateParser\ConditionsParser;
 
-class ConditionsParserTest extends \PHPUnit_Framework_TestCase
+class ConditionsParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConditionsParser
