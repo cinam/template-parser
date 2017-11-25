@@ -29,7 +29,7 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('begin one end', $this->parser->parse($text));
 
         $text2 = 'begin [IF 0]two[ENDIF] end';
-        $this->assertEquals('begin end', $this->parser->parse($text2));
+        $this->assertEquals('begin  end', $this->parser->parse($text2));
     }
 }
 
