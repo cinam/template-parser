@@ -23,6 +23,12 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
         unset($this->parser);
     }
 
+    public function testNoIfs()
+    {
+        $text = 'begin middle end';
+        $this->assertEquals('begin middle end', $this->parser->parse($text));
+    }
+
     public function testSimpleIf()
     {
         $text = 'begin [IF 1]one[ENDIF] end';

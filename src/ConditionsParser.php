@@ -8,6 +8,10 @@ class ConditionsParser
     public function parse($text, array $values = [])
     {
         $ifPosition = strpos($text, '[IF ');
+        if ($ifPosition === false) {
+            return $text;
+        }
+
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
         $endifPosition = strpos($text, '[ENDIF]');
         $endPosition = $endifPosition + 7; // strlen('[ENDIF'])
