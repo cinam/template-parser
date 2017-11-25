@@ -73,5 +73,11 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 1]one[ENDIF][IF 1] two[ENDIF][IF 0] three[ENDIF]', 'one two'],
         ];
     }
+
+    public function testEmptyIf()
+    {
+        $this->assertEquals('foo  bar', $this->parser->parse('foo [IF 1][ENDIF] bar'));
+        $this->assertEquals('foo  bar', $this->parser->parse('foo [IF 0][ENDIF] bar'));
+    }
 }
 
