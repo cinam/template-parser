@@ -79,5 +79,23 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foo  bar', $this->parser->parse('foo [IF 1][ENDIF] bar'));
         $this->assertEquals('foo  bar', $this->parser->parse('foo [IF 0][ENDIF] bar'));
     }
+
+    /**
+     * @dataProvider providerTwoLevels
+     */
+    public function testTwoLevels($input, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($input));
+    }
+
+    public function providerTwoLevels()
+    {
+        return [
+            ['[IF 1]foo [IF 1]bar[ENDIF][ENDIF]', 'foo bar'],
+            ['[IF 1]foo [IF 0]bar[ENDIF][ENDIF]', 'foo '],
+            ['[IF 0]foo [IF 1]bar[ENDIF][ENDIF]', ''],
+            ['[IF 0]foo [IF 0]bar[ENDIF][ENDIF]', ''],
+        ];
+    }
 }
 
