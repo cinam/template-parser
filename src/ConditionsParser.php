@@ -43,7 +43,7 @@ class ConditionsParser
         $condition = substr($text, $ifPosition + 4, $ifContentPosition - 1 - $ifPosition - 4);
 
         $result = '';
-        if ($condition) {
+        if ($this->evaluateCondition($condition)) {
             // content ending with position of else or endif
             if ($elseIndex !== null) {
                 $result = substr($text, $ifContentPosition, $elseIndex - $ifContentPosition);
@@ -117,5 +117,23 @@ class ConditionsParser
         }
 
         return $elseIndex;
+    }
+
+    private function evaluateCondition($text)
+    {
+        $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($parts) !== 1 && count($parts) !== 3) {
+            throw new InvalidSyntaxException();
+        }
+
+        if (count($parts) === 1) {
+            return (boolean) $parts[0];
+        } else {
+            if (in_array($parts[1], ['==', '<', '>', '<=', '>=', '!=', '<>'])) {
+                return eval(sprintf('return (%s %s %s);', (integer) $parts[0], $parts[1], (integer) $parts[2]));
+            } else {
+                throw new InvalidSyntaxException();
+            }
+        }
     }
 }
