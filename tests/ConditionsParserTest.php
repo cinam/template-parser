@@ -175,5 +175,37 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 1]one [ElSE] two[ENDIF]', 'one [ElSE] two'],
         ];
     }
+
+    /**
+     * @dataProvider providerSimpleCondition
+     */
+    public function testSimpleCondition($input, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($input));
+    }
+
+    public function providerSimpleCondition()
+    {
+        return [
+            ['[IF 1 == 1]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 1 == 2]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 2 > 1]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 1 > 2]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 1 > 1]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 1 < 2]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 2 < 1]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 1 < 1]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 1 <= 2]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 2 <= 2]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 3 <= 2]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 2 >= 1]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 2 >= 2]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 2 >= 3]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 2 != 1]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 1 != 1]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF 2 <> 1]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF 1 <> 1]yes[ELSE]no[ENDIF]', 'no'],
+        ];
+    }
 }
 
