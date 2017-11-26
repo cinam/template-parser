@@ -16,13 +16,23 @@ class ConditionsParser
 
         $ifIndexes = $this->getIfIndexesForCurrentDepth($text);
         $ifStarts = $ifIndexes[0];
-        $ifEnds = $ifIndexes[1];
+        $elseStarts = $ifIndexes[1];
+        $ifEnds = $ifIndexes[2];
 
         $result = substr($text, 0, $ifStarts[0]);
 
         $cnt = count($ifStarts);
         for ($i = 0; $i < $cnt; $i++) {
-            $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1));
+            // search for an else between current if and endif
+            $elseIndex = null;
+            foreach ($elseStarts as $elseStart) {
+                if ($ifStarts[$i] < $elseStart && $elseStart < $ifEnds[$i]) {
+                    $elseIndex = $elseStart;
+                    // todo: two else starts -> syntax error
+                }
+            }
+
+            $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1), $elseIndex);
             $nextIf = (isset($ifStarts[$i + 1]) ? $ifStarts[$i + 1] : strlen($text) + 1);
             $result .= substr($text, $ifEnds[$i] + 1, $nextIf - $ifEnds[$i] - 1);
         }
@@ -30,7 +40,7 @@ class ConditionsParser
         return $result;
     }
 
-    private function getConditionResult($text)
+    private function getConditionResult($text, $elseIndex)
     {
         $ifPosition = 0;
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
@@ -41,7 +51,16 @@ class ConditionsParser
 
         $result = '';
         if ($condition) {
-            $result = substr($text, $ifContentPosition, $endifPosition - $ifContentPosition);
+            // content ending with position of else or endif
+            if ($elseIndex !== null) {
+                $result = substr($text, $ifContentPosition, $elseIndex - $ifContentPosition);
+            } else {
+                $result = substr($text, $ifContentPosition, $endifPosition - $ifContentPosition);
+            }
+        } else {
+            if ($elseIndex !== null) {
+                $result = substr($text, $elseIndex + 6, -7);
+            }
         }
 
         return $this->parse($result);
@@ -50,6 +69,7 @@ class ConditionsParser
     private function getIfIndexesForCurrentDepth($text)
     {
         $starts = [];
+        $elses = [];
         $ends = [];
 
         $currentDepth = 0;
@@ -67,6 +87,10 @@ class ConditionsParser
                 if ($currentDepth === 0) {
                     $ends[] = $i + 6; // last letter of "[ENDIF]"
                 }
+            } elseif (substr($text, $i, 6) === '[ELSE]') {
+                if ($currentDepth === 1) {
+                    $elses[] = $i;
+                }
             }
 
             if ($currentDepth < 0) {
@@ -80,6 +104,7 @@ class ConditionsParser
 
         return [
             $starts,
+            $elses,
             $ends,
         ];
     }
