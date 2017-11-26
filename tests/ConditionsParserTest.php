@@ -166,6 +166,12 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 0]one[IF 0]two[ELSE]three[ENDIF][ELSE]four[IF 1]five[ELSE][IF 1]six[ELSE]seven[ENDIF][ENDIF][ENDIF]', 'fourfive'],
             ['[IF 0]one[IF 0]two[ELSE]three[ENDIF][ELSE]four[IF 0]five[ELSE][IF 1]six[ELSE]seven[ENDIF][ENDIF][ENDIF]', 'foursix'],
             ['[IF 0]one[IF 0]two[ELSE]three[ENDIF][ELSE]four[IF 0]five[ELSE][IF 0]six[ELSE]seven[ENDIF][ENDIF][ENDIF]', 'fourseven'],
+
+            // not strict "[ELSE]" is treated as normal text
+            ['[IF 1]one ELSE two[ENDIF]', 'one ELSE two'],
+            ['[IF 1]one [ELSE two[ENDIF]', 'one [ELSE two'],
+            ['[IF 1]one [else] two[ENDIF]', 'one [else] two'],
+            ['[IF 1]one [ElSE] two[ENDIF]', 'one [ElSE] two'],
         ];
     }
 }
