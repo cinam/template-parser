@@ -44,8 +44,7 @@ class ConditionsParser
     {
         $ifPosition = 0;
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
-        $endifPosition = strlen($text) - 7;
-        $endPosition = $endifPosition + 7; // strlen('[ENDIF'])
+        $endifPosition = strlen($text) - 7; // // strlen('[ENDIF'])
 
         $condition = substr($text, $ifPosition + 4, $ifContentPosition - 1 - $ifPosition - 4);
 
@@ -55,7 +54,7 @@ class ConditionsParser
             if ($elseIndex !== null) {
                 $result = substr($text, $ifContentPosition, $elseIndex - $ifContentPosition);
             } else {
-                $result = substr($text, $ifContentPosition, $endifPosition - $ifContentPosition);
+                $result = substr($text, $ifContentPosition, -7);
             }
         } else {
             if ($elseIndex !== null) {
