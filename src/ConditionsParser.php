@@ -24,17 +24,7 @@ class ConditionsParser
         $cnt = count($ifStarts);
         for ($i = 0; $i < $cnt; $i++) {
             // search for an else between current if and endif
-            $elseIndex = null;
-            foreach ($elseStarts as $elseStart) {
-                if ($ifStarts[$i] < $elseStart && $elseStart < $ifEnds[$i]) {
-                    if (isset($elseIndex)) {
-                        // there already is an else -> too many elses!
-                        throw new InvalidSyntaxException();
-                    }
-
-                    $elseIndex = $elseStart - $ifStarts[$i];
-                }
-            }
+            $elseIndex = $this->getElseIndex($elseStarts, $ifStarts[$i], $ifEnds[$i]);
 
             $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1), $elseIndex);
             $nextIf = (isset($ifStarts[$i + 1]) ? $ifStarts[$i + 1] : strlen($text) + 1);
@@ -110,5 +100,22 @@ class ConditionsParser
             $elses,
             $ends,
         ];
+    }
+
+    private function getElseIndex(array $elseStarts, $ifStart, $ifEnd)
+    {
+        $elseIndex = null;
+        foreach ($elseStarts as $elseStart) {
+            if ($ifStart < $elseStart && $elseStart < $ifEnd) {
+                if (isset($elseIndex)) {
+                    // there already is an else -> too many elses in one if!
+                    throw new InvalidSyntaxException();
+                }
+
+                $elseIndex = $elseStart - $ifStart;
+            }
+        }
+
+        return $elseIndex;
     }
 }
