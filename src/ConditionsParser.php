@@ -27,7 +27,7 @@ class ConditionsParser
             $elseIndex = null;
             foreach ($elseStarts as $elseStart) {
                 if ($ifStarts[$i] < $elseStart && $elseStart < $ifEnds[$i]) {
-                    $elseIndex = $elseStart;
+                    $elseIndex = $elseStart - $ifStarts[$i];
                     // todo: two else starts -> syntax error
                 }
             }

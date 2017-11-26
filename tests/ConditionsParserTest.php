@@ -142,18 +142,23 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider providerBasicElse
+     * @dataProvider providerElse
      */
-    public function testBasicElse($input, $expected)
+    public function testElse($input, $expected)
     {
         $this->assertEquals($expected, $this->parser->parse($input));
     }
 
-    public function providerBasicElse()
+    public function providerElse()
     {
         return [
+            // basic
             ['[IF 1]one[ELSE]two[ENDIF]', 'one'],
             ['[IF 0]one[ELSE]two[ENDIF]', 'two'],
+
+            // two elses, one level
+            ['[IF 1]one[ELSE]two[ENDIF] [IF 1]one[ELSE]two[ENDIF]', 'one one'],
+            ['[IF 1]one[ELSE]two[ENDIF] [IF 0]one[ELSE]two[ENDIF]', 'one two'],
         ];
     }
 }
