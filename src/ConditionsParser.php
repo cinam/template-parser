@@ -7,7 +7,7 @@ use Cinam\TemplateParser\Exception\InvalidSyntaxException;
 class ConditionsParser
 {
 
-    public function parse($text)
+    public function parse($text, array $variables = [])
     {
         // can it be removed?
         if (strpos($text, '[IF ') === false && strpos($text, '[ENDIF]') === false) {
@@ -26,7 +26,8 @@ class ConditionsParser
             // search for an else between current if and endif
             $elseIndex = $this->getElseIndex($elseStarts, $ifStarts[$i], $ifEnds[$i]);
 
-            $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1), $elseIndex);
+            // todo stop passing $variables over and over
+            $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1), $elseIndex, $variables);
             $nextIf = (isset($ifStarts[$i + 1]) ? $ifStarts[$i + 1] : strlen($text) + 1);
             $result .= substr($text, $ifEnds[$i] + 1, $nextIf - $ifEnds[$i] - 1);
         }
@@ -34,7 +35,7 @@ class ConditionsParser
         return $result;
     }
 
-    private function getConditionResult($text, $elseIndex)
+    private function getConditionResult($text, $elseIndex, array $variables)
     {
         $ifPosition = 0;
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
@@ -43,7 +44,7 @@ class ConditionsParser
         $condition = substr($text, $ifPosition + 4, $ifContentPosition - 1 - $ifPosition - 4);
 
         $result = '';
-        if ($this->evaluateCondition($condition)) {
+        if ($this->evaluateCondition($condition, $variables)) {
             // content ending with position of else or endif
             if ($elseIndex !== null) {
                 $result = substr($text, $ifContentPosition, $elseIndex - $ifContentPosition);
@@ -56,7 +57,7 @@ class ConditionsParser
             }
         }
 
-        return $this->parse($result);
+        return $this->parse($result, $variables);
     }
 
     private function getIfIndexesForCurrentDepth($text)
@@ -119,7 +120,7 @@ class ConditionsParser
         return $elseIndex;
     }
 
-    private function evaluateCondition($text)
+    private function evaluateCondition($text, array $variables)
     {
         $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
         if (count($parts) !== 1 && count($parts) !== 3) {
@@ -129,8 +130,26 @@ class ConditionsParser
         if (count($parts) === 1) {
             return (boolean) $parts[0];
         } else {
-            if (in_array($parts[1], ['==', '<', '>', '<=', '>=', '!=', '<>'])) {
-                return eval(sprintf('return (%s %s %s);', (integer) $parts[0], $parts[1], (integer) $parts[2]));
+            $operator = $parts[1];
+            if (in_array($operator, ['==', '<', '>', '<=', '>=', '!=', '<>'])) {
+                if (is_numeric($parts[0])) {
+                    $var1 = $parts[0];
+                } elseif (array_key_exists($parts[0], $variables)) {
+                    $var1 = $variables[$parts[0]];
+                } else {
+                    $var1 = 'null';
+                }
+
+                if (is_numeric($parts[2])) {
+                    $var2 = $parts[2];
+                } elseif (array_key_exists($parts[2], $variables)) {
+                    $var2 = $variables[$parts[2]];
+                } else {
+                    $var2 = 'null';
+                }
+
+                // todo remove "eval"
+                return eval(sprintf('return (%s %s %s);', $var1, $operator, $var2));
             } else {
                 throw new InvalidSyntaxException();
             }

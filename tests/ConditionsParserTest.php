@@ -233,7 +233,7 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 1 == var1]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
             ['[IF 1 == var1]yes[ELSE]no[ENDIF]', ['var1' => 2], 'no'],
             ['[IF 1 == var1]yes[ELSE]no[ENDIF]', [], 'no'],
-            ['[IF 0 == var1]yes[ELSE]no[ENDIF]', [], 'no'],
+            ['[IF 0 == var1]yes[ELSE]no[ENDIF]', [], 'yes'], // 0 == null
             ['[IF 1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1], 'no'],
 
             ['[IF var1 == 1]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
