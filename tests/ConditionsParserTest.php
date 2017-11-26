@@ -218,5 +218,30 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF  1   ==  2 ]yes[ELSE]no[ENDIF]', 'no'],
         ];
     }
+
+    /**
+     * @dataProvider providerConditionWithVariables
+     */
+    public function testConditionWithVariables($input, array $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($input, $variables));
+    }
+
+    public function providerConditionWithVariables()
+    {
+        return [
+            ['[IF 1 == var1]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
+            ['[IF 1 == var1]yes[ELSE]no[ENDIF]', ['var1' => 2], 'no'],
+            ['[IF 1 == var1]yes[ELSE]no[ENDIF]', [], 'no'],
+            ['[IF 0 == var1]yes[ELSE]no[ENDIF]', [], 'no'],
+            ['[IF 1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1], 'no'],
+
+            ['[IF var1 == 1]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
+            ['[IF var1 == 1]yes[ELSE]no[ENDIF]', ['var1' => 2], 'no'],
+
+            ['[IF var1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1, 'var2' => 1], 'yes'],
+            ['[IF var1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1, 'var2' => 2], 'no'],
+        ];
+    }
 }
 
