@@ -41,8 +41,8 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['begin {var1} end', ['var1' => 1], 'begin 1 end'],
-//            ['begin {var1} {var1} end', ['var1' => 1], 'begin 1 1 end'],
-//            ['begin {var1} {var2} end', ['var1' => 1, 'var2' => 2], 'begin 1 2 end'],
+            ['begin {var1} {var1} end', ['var1' => 1], 'begin 1 1 end'],
+            ['begin {var1} {var2} end', ['var1' => 1, 'var2' => 2], 'begin 1 2 end'],
         ];
     }
 }
