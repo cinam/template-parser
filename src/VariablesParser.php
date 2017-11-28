@@ -127,6 +127,9 @@ class VariablesParser
         $tableIndexes = $this->getTableIndexesForCurrentDepth($text);
         $tableStarts = $tableIndexes[0];
         $tableEnds = $tableIndexes[1];
+        if (empty($tableStarts)) {
+            return $text;
+        }
 
         $result = substr($text, 0, $tableStarts[0]);
 

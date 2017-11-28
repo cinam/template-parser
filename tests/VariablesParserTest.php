@@ -124,9 +124,14 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     public function providerTable()
     {
         return [
+            // no tables
+            ['begin end', [], 'begin end'],
+
+            // one table without variables
             ['begin [START table1]foo [END] end', ['table1' => []], 'begin  end'],
             ['begin [START table1]foo [END] end', ['table1' => [[], [], []]], 'begin foo foo foo  end'],
 
+            // one table with variables
             ['begin [START table1]{var1}[END] end', ['table1' => [['var1' => 1], ['var1' => 2], ['var1' => 3]]], 'begin 123 end'],
             ['begin [START table1]{var1}foo{var1} [END] end', ['table1' => [['var1' => 1], ['var1' => 2], ['var1' => 3]]], 'begin 1foo1 2foo2 3foo3  end'],
 
@@ -140,6 +145,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                 'begin 12 middle 34 end'
             ],
 
+            /*
             // nested tables
             [
                 '[START table1]{var1}[START table1]{var1}[END][END]',
@@ -169,6 +175,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                 ]],
                 '1ab2cd'
             ],
+            */
         ];
     }
 }
