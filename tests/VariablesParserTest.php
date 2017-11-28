@@ -45,5 +45,26 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['begin {var1} {var2} end', ['var1' => 1, 'var2' => 2], 'begin 1 2 end'],
         ];
     }
+
+    /**
+     * @dataProvider providerStandardBorderCases
+     */
+    public function testStandardBorderCases($input, $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parseStandard($input, $variables));
+    }
+
+    public function providerStandardBorderCases()
+    {
+        return [
+            ['begin {var1}', ['var1' => 1], 'begin 1'],
+            ['begin{var1}', ['var1' => 1], 'begin1'],
+            ['{var1} end', ['var1' => 1], '1 end'],
+            ['{var1}end', ['var1' => 1], '1end'],
+            ['{var1}', ['var1' => 1], '1'],
+            ['{var1}{var1}', ['var1' => 1], '11'],
+            ['{var1}middle{var1}', ['var1' => 1], '1middle1'],
+        ];
+    }
 }
 
