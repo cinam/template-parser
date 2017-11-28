@@ -39,7 +39,7 @@ class ConditionsParser
     {
         $ifPosition = 0;
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
-        $endifPosition = strlen($text) - 7; // // strlen('[ENDIF'])
+        $endifPosition = strlen($text) - 7; // strlen('[ENDIF'])
 
         $condition = substr($text, $ifPosition + 4, $ifContentPosition - 1 - $ifPosition - 4);
 

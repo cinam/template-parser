@@ -112,5 +112,21 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['[IF var1]', [], '[IF var1]'],
         ];
     }
+
+    /**
+     * @dataProvider providerTable
+     */
+    public function testTable($input, $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parseTables($input, $variables));
+    }
+
+    public function providerTable()
+    {
+        return [
+            ['begin [START table1]foo [END] end', ['table1' => []], 'begin  end'],
+            ['begin [START table1]foo [END] end', ['table1' => [[], [], []]], 'begin foo foo foo  end'],
+        ];
+    }
 }
 
