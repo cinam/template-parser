@@ -126,6 +126,9 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
         return [
             ['begin [START table1]foo [END] end', ['table1' => []], 'begin  end'],
             ['begin [START table1]foo [END] end', ['table1' => [[], [], []]], 'begin foo foo foo  end'],
+
+            ['begin [START table1]{var1}[END] end', ['table1' => [['var1' => 1], ['var1' => 2], ['var1' => 3]]], 'begin 123 end'],
+            ['begin [START table1]{var1}foo{var1} [END] end', ['table1' => [['var1' => 1], ['var1' => 2], ['var1' => 3]]], 'begin 1foo1 2foo2 3foo3  end'],
         ];
     }
 }
