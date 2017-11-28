@@ -1,4 +1,6 @@
 {
+    "name": "cinam/template-parser",
+    "description": "Template parser",
     "autoload": {
         "psr-4": {
             "Cinam\\TemplateParser\\": "src/"
