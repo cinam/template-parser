@@ -91,5 +91,26 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['begin {var1}} end', ['var1' => 1], 'begin 1} end'],
         ];
     }
+
+    /**
+     * @dataProvider providerStandardVariableInConditions
+     */
+    public function testStandardVariableInConditions($input, $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parseStandard($input, $variables));
+    }
+
+    public function providerStandardVariableInConditions()
+    {
+        return [
+            ['[IF 1]', ['var1' => 1], '[IF 1]'],
+            ['[IF var1]', ['var1' => 1], '[IF 1]'],
+            ['[IF var1 == 5]', ['var1' => 1], '[IF 1 == 5]'],
+            ['[IF 5 == var1]', ['var1' => 1], '[IF 5 == 1]'],
+            ['[IF var1 == var1]', ['var1' => 1], '[IF 1 == 1]'],
+            ['[IF var1 == var2]', ['var1' => 1, 'var2' => 2], '[IF 1 == 2]'],
+            ['[IF var1]', [], '[IF var1]'],
+        ];
+    }
 }
 
