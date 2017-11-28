@@ -66,5 +66,30 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['{var1}middle{var1}', ['var1' => 1], '1middle1'],
         ];
     }
+
+    /**
+     * @dataProvider providerStandardVariableCharacters
+     */
+    public function testStandardVariableCharacters($input, $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parseStandard($input, $variables));
+    }
+
+    public function providerStandardVariableCharacters()
+    {
+        return [
+            // printable characters
+            ['begin {abcABC1_09} end', ['abcABC1_09' => 1], 'begin 1 end'],
+
+            // invalid variable names
+            ['begin {ab c} end', ['ab c' => 1], 'begin {ab c} end'],
+            ['begin {ab#c} end', ['ab#c' => 1], 'begin {ab#c} end'],
+            ['begin {ab;c} end', ['ab;c' => 1], 'begin {ab;c} end'],
+
+            // {, } do not break the variable
+            ['begin {{var1} end', ['var1' => 1], 'begin {1 end'],
+            ['begin {var1}} end', ['var1' => 1], 'begin 1} end'],
+        ];
+    }
 }
 
