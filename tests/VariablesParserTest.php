@@ -114,14 +114,14 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider providerTable
+     * @dataProvider providerSimpleTable
      */
-    public function testTable($input, $variables, $expected)
+    public function testSimpleTable($input, $variables, $expected)
     {
         $this->assertEquals($expected, $this->parser->parseTables($input, $variables));
     }
 
-    public function providerTable()
+    public function providerSimpleTable()
     {
         return [
             // no tables
@@ -144,39 +144,41 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                 ['table1' => [['var1' => 1], ['var1' => 2]], 'table2' => [['var1' => 3], ['var1' => 4]]],
                 'begin 12 middle 34 end'
             ],
-
-            /*
-            // nested tables
-            [
-                '[START table1]{var1}[START table1]{var1}[END][END]',
-                ['table1' => [
-                    [
-                        'var1' => 1,
-                        'table1' => [
-                            [
-                                'var1' => 'a',
-                            ],
-                            [
-                                'var1' => 'b',
-                            ],
-                        ],
-                    ],
-                    [
-                        'var1' => 2,
-                        'table1' => [
-                            [
-                                'var1' => 'c',
-                            ],
-                            [
-                                'var1' => 'd',
-                            ],
-                        ],
-                    ],
-                ]],
-                '1ab2cd'
-            ],
-            */
         ];
+    }
+
+    public function testNestedTable()
+    {
+        $this->markTestSkipped();
+        $input = '[START table1]{var1}[START table1]{var1}[END][END]';
+        $variables = [
+            'table1' => [
+                [
+                    'var1' => 1,
+                    'table1' => [
+                        [
+                            'var1' => 'a',
+                        ],
+                        [
+                            'var1' => 'b',
+                        ],
+                    ],
+                ],
+                [
+                    'var1' => 2,
+                    'table1' => [
+                        [
+                            'var1' => 'c',
+                        ],
+                        [
+                            'var1' => 'd',
+                        ],
+                    ],
+                ],
+            ]
+        ];
+
+        $this->assertEquals('1ab2cd', $this->parser->parseTables($input, $variables));
     }
 }
 
