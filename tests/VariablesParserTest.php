@@ -193,6 +193,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['begin [START table1]foo [END table1]end', ['table1' => [[]]], 'begin foo end'],
+            ['begin [START table1]foo [END table1][START table2]bar [END tableX]end', ['table1' => [[]], 'table2' => [[]]], 'begin foo bar end'],
             ['[START table1]foo[END another_suffix]', ['table1' => [[]]], 'foo'],
             ['[START table1]foo[END 12345678901234567890123456789012345678901234567890]', ['table1' => [[]]], 'foo'],
         ];
