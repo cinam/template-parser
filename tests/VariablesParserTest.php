@@ -180,5 +180,42 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('1ab2cd', $this->parser->parseTables($input, $variables));
     }
+
+    /**
+     * @dataProvider providerExtendedEND
+     */
+    public function testExtendedEND($input, $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parseTables($input, $variables));
+    }
+
+    public function providerExtendedEND()
+    {
+        return [
+            ['begin [START table1]foo [END table1]end', ['table1' => [[]]], 'begin foo end'],
+            ['[START table1]foo[END another_suffix]', ['table1' => [[]]], 'foo'],
+            ['[START table1]foo[END 12345678901234567890123456789012345678901234567890]', ['table1' => [[]]], 'foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider providerInvalidEndSuffix
+     * @expectedException Cinam\TemplateParser\Exception\InvalidEndSuffixException
+     */
+    public function testEndSuffixError($input)
+    {
+        $this->parser->parseTables($input, []);
+    }
+
+    public function providerInvalidEndSuffix()
+    {
+        return [
+            // double suffix
+            ['[START table1]foo [END table1 bar]'],
+
+            // 51 chars
+            ['[START table1]foo [END 123456789012345678901234567890123456789012345678901]'],
+        ];
+    }
 }
 
