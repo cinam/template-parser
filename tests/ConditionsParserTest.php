@@ -261,6 +261,9 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 1]foo[ELSE]bar[ENDIF bar]', 'foo'],
             ['[IF 0]foo[ELSE]bar[ENDIF baz_1]', 'bar'],
 
+            ['[IF 1]foo[ENDIF foo] [IF 1]bar[ENDIF bar]', 'foo bar'],
+            ['[IF 0]foo[ENDIF foo] [IF 0]bar[ENDIF bar]', ' '],
+
             ['start [IF 0]foo[ELSE][IF 1]bar[ELSE]baz[ENDIF bar_1][ENDIF baz_1] end', 'start bar end'],
             ['[IF 1]foo[ENDIF 12345678901234567890123456789012345678901234567890]', 'foo'],
         ];
