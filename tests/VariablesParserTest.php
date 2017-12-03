@@ -185,14 +185,17 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNestedTable()
+    /**
+     * @dataProvider providerNestedTables
+     */
+    public function testNestedTables($input, $expected)
     {
-        $input = '[START table1]{var1}[START table2]{var1}[END][END]';
         $variables = [
             'table1' => [
                 [
                     'var1' => 1,
-                    'table2' => [
+                    'var2' => 'w',
+                    'table1' => [
                         [
                             'var1' => 'a',
                         ],
@@ -200,9 +203,6 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                             'var1' => 'b',
                         ],
                     ],
-                ],
-                [
-                    'var1' => 2,
                     'table2' => [
                         [
                             'var1' => 'c',
@@ -212,10 +212,79 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-            ]
+                [
+                    'var1' => 2,
+                    'var2' => 'x',
+                    'table1' => [
+                        [
+                            'var1' => 'e',
+                        ],
+                        [
+                            'var1' => 'f',
+                        ],
+                    ],
+                    'table2' => [
+                        [
+                            'var1' => 'g',
+                        ],
+                        [
+                            'var1' => 'h',
+                        ],
+                    ],
+                ],
+            ],
+            'table2' => [
+                [
+                    'var1' => 3,
+                    'var2' => 'y',
+                    'table1' => [
+                        [
+                            'var1' => 'i',
+                        ],
+                        [
+                            'var1' => 'j',
+                        ],
+                    ],
+                    'table2' => [
+                        [
+                            'var1' => 'k',
+                        ],
+                        [
+                            'var1' => 'l',
+                        ],
+                    ],
+                ],
+                [
+                    'var1' => 4,
+                    'var2' => 'z',
+                    'table1' => [
+                        [
+                            'var1' => 'm',
+                        ],
+                        [
+                            'var1' => 'n',
+                        ],
+                    ],
+                    'table2' => [
+                        [
+                            'var1' => 'o',
+                        ],
+                        [
+                            'var1' => 'p',
+                        ],
+                    ],
+                ],
+            ],
         ];
 
-        $this->assertEquals('1ab2cd', $this->parser->parseTables($input, $variables));
+        $this->assertEquals($expected, $this->parser->parseTables($input, $variables));
+    }
+
+    public function providerNestedTables()
+    {
+        return [
+            ['[START table1]{var1}[START table2]{var1}[END][END]', '1cd2gh'],
+        ];
     }
 }
 
