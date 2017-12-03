@@ -110,6 +110,8 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['[IF var1 == var1]', ['var1' => 1], '[IF 1 == 1]'],
             ['[IF var1 == var2]', ['var1' => 1, 'var2' => 2], '[IF 1 == 2]'],
             ['[IF var1]', [], '[IF var1]'],
+
+            ['foo [IF var1] bar [IF var2] baz', [], 'foo [IF var1] bar [IF var2] baz'],
         ];
     }
 
@@ -137,6 +139,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
 
             // with conditions
             ['begin [START table1][IF cond]yes[ENDIF][END] end', ['table1' => [['cond' => 1], ['cond' => 0]]], 'begin [IF 1]yes[ENDIF][IF 0]yes[ENDIF] end'],
+            ['[IF 1][ENDIF][START table1][END]', ['table1' => []], '[IF 1][ENDIF]'],
 
             // two tables
             [
@@ -144,6 +147,9 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                 ['table1' => [['var1' => 1], ['var1' => 2]], 'table2' => [['var1' => 3], ['var1' => 4]]],
                 'begin 12 middle 34 end'
             ],
+
+            // not parsing variables outside tables
+            ['{var1} [START table1]{var1}[END] end', ['var1' => 0, 'table1' => [['var1' => 1], ['var1' => 2], ['var1' => 3]]], '{var1} 123 end'],
         ];
     }
 
@@ -191,6 +197,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     public function testNestedTables($input, $expected)
     {
         $variables = [
+            'var1' => 0,
             'table1' => [
                 [
                     'var1' => 1,
@@ -233,48 +240,6 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            'table2' => [
-                [
-                    'var1' => 3,
-                    'var2' => 'y',
-                    'table1' => [
-                        [
-                            'var1' => 'i',
-                        ],
-                        [
-                            'var1' => 'j',
-                        ],
-                    ],
-                    'table2' => [
-                        [
-                            'var1' => 'k',
-                        ],
-                        [
-                            'var1' => 'l',
-                        ],
-                    ],
-                ],
-                [
-                    'var1' => 4,
-                    'var2' => 'z',
-                    'table1' => [
-                        [
-                            'var1' => 'm',
-                        ],
-                        [
-                            'var1' => 'n',
-                        ],
-                    ],
-                    'table2' => [
-                        [
-                            'var1' => 'o',
-                        ],
-                        [
-                            'var1' => 'p',
-                        ],
-                    ],
-                ],
-            ],
         ];
 
         $this->assertEquals($expected, $this->parser->parseTables($input, $variables));
@@ -284,6 +249,14 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['[START table1]{var1}[START table2]{var1}[END][END]', '1cd2gh'],
+            ['[START table1]{var1}[START table1]{var1}[END][END]', '1ab2ef'],
+            ['[START table1]{var1}[START table2]{var1}[END][END] [START table1]{var1}[START table2]{var1}[END][END]', '1cd2gh 1cd2gh'],
+            ['[START table1]{var1}[START table2]{var1}[END][END] [START table1]{var1}[START table1]{var1}[END][END]', '1cd2gh 1ab2ef'],
+
+            [
+                '[IF var1][ENDIF][START table1][IF var1][ENDIF][START table1][IF var1][ENDIF][END][END]',
+                '[IF var1][ENDIF][IF 1][ENDIF][IF a][ENDIF][IF b][ENDIF][IF 2][ENDIF][IF e][ENDIF][IF f][ENDIF]'
+            ],
         ];
     }
 }

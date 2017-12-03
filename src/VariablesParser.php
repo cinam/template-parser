@@ -71,6 +71,7 @@ class VariablesParser
             $ifStart = strpos($text, '[IF ', $currentIndex);
             $ifEnd = strpos($text, ']', $ifStart);
             if ($ifStart !== false && $ifEnd !== false) {
+                $result .= substr($text, $currentIndex, $ifStart - $currentIndex);
                 $conditionString = substr($text, $ifStart + 4, $ifEnd - $ifStart - 4);
                 $result .= '[IF ' . $this->replaceVariablesInCondition($conditionString, $variables) . ']';
                 $currentIndex = $ifEnd + 1;
