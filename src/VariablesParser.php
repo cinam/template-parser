@@ -3,8 +3,8 @@
 namespace Cinam\TemplateParser;
 
 use Cinam\TemplateParser\Exception\InvalidSyntaxException;
-use Cinam\TemplateParser\Exception\MissingTableIdentifierException;
-use Cinam\TemplateParser\Exception\TableVariableNotSetException;
+use Cinam\TemplateParser\Exception\MissingTableVariableException;
+use Cinam\TemplateParser\Exception\InvalidTableVariableException;
 use Cinam\TemplateParser\Exception\InvalidEndSuffixException;
 
 class VariablesParser
@@ -170,9 +170,9 @@ class VariablesParser
         // 7 = strlen('[TABLE ')
         $tableIdentifier = substr($text, 7, strpos($text, ']') - 7);
         if (!array_key_exists($tableIdentifier, $variables)) {
-            throw new MissingTableIdentifierException($tableIdentifier);
+            throw new MissingTableVariableException($tableIdentifier);
         } elseif (!is_array($variables[$tableIdentifier])) {
-            throw new TableVariableNotSetException($tableIdentifier);
+            throw new InvalidTableVariableException($tableIdentifier);
         }
 
         return $tableIdentifier;
