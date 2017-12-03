@@ -149,23 +149,32 @@ class VariablesParser
 
     private function parseTable($text, array $variables)
     {
-        $tableStartPosition = 0;
-        $tableContentPosition = strpos($text, ']', $tableStartPosition + 1) + 1;
+        $tableContentPosition = strpos($text, ']') + 1;
         $tableEndPosition = strrpos($text, '[END'); // strRpos
+        $tableIdentifier = $this->getTableIdentifier($text, $variables);
 
-        $tableIdentifier = substr($text, $tableStartPosition + 7, $tableContentPosition - 1 - $tableStartPosition - 7);
+        $result = '';
+        foreach ($variables[$tableIdentifier] as $tableValues) {
+            $textToParse = substr($text, $tableContentPosition, $tableEndPosition - $tableContentPosition);
+            $mergedVariables = array_merge($variables, $tableValues);
+            $textWithParsedTables = $this->parseTableVariablesWithConditions($textToParse, $mergedVariables);
+            $result .= $this->parseStandard($textWithParsedTables, $mergedVariables);
+        }
+
+        return $result;
+    }
+
+    private function getTableIdentifier($text, array $variables)
+    {
+        // 7 = strlen('[TABLE ')
+        $tableIdentifier = substr($text, 7, strpos($text, ']') - 7);
         if (!array_key_exists($tableIdentifier, $variables)) {
             throw new MissingTableIdentifierException($tableIdentifier);
         } elseif (!is_array($variables[$tableIdentifier])) {
             throw new TableVariableNotSetException($tableIdentifier);
         }
 
-        $result = '';
-        foreach ($variables[$tableIdentifier] as $tableValues) {
-            $result .= $this->parseStandard(substr($text, $tableContentPosition, $tableEndPosition - $tableContentPosition), $tableValues);
-        }
-
-        return $result;
+        return $tableIdentifier;
     }
 
     private function getTableIndexesForCurrentDepth($text)
