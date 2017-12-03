@@ -104,12 +104,12 @@ class ConditionsParser
             }
 
             if ($currentDepth < 0) {
-                throw new InvalidSyntaxException();
+                throw new InvalidSyntaxException($text);
             }
         }
 
         if ($currentDepth !== 0) {
-            throw new InvalidSyntaxException();
+            throw new InvalidSyntaxException($text);
         }
 
         return [
@@ -126,7 +126,7 @@ class ConditionsParser
             if ($ifStart < $elseStart && $elseStart < $ifEnd) {
                 if (isset($elseIndex)) {
                     // there already is an else -> too many elses in one if!
-                    throw new InvalidSyntaxException();
+                    throw new InvalidSyntaxException(''); // todo another exception
                 }
 
                 $elseIndex = $elseStart - $ifStart;
@@ -140,7 +140,7 @@ class ConditionsParser
     {
         $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
         if (count($parts) !== 1 && count($parts) !== 3) {
-            throw new InvalidSyntaxException();
+            throw new InvalidSyntaxException($text);
         }
 
         if (count($parts) === 1) {
@@ -175,7 +175,7 @@ class ConditionsParser
     private function checkEndifSuffix($text)
     {
         if (!(strlen($text) <= self::MAX_ENDIF_SUFFIX_LENGTH && preg_match('#^[[:alnum:]_]+$#', $text))) {
-            throw new InvalidEndifSuffixException();
+            throw new InvalidEndifSuffixException($text);
         }
     }
 }

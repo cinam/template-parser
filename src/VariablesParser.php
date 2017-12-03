@@ -212,12 +212,12 @@ class VariablesParser
             }
 
             if ($currentDepth < 0) {
-                throw new InvalidSyntaxException();
+                throw new InvalidSyntaxException($text);
             }
         }
 
         if ($currentDepth !== 0) {
-            throw new InvalidSyntaxException();
+            throw new InvalidSyntaxException($text);
         }
 
         return [
@@ -229,7 +229,7 @@ class VariablesParser
     private function checkEndSuffix($text)
     {
         if (!(strlen($text) <= self::MAX_END_SUFFIX_LENGTH && preg_match('#^[[:alnum:]_]+$#', $text))) {
-            throw new InvalidEndSuffixException();
+            throw new InvalidEndSuffixException($text);
         }
     }
 }

@@ -9,6 +9,7 @@ class MissingTableVariableException extends \Exception
 
     public function __construct($variableName)
     {
+        $this->variableName - $variableName;
         parent::__construct(sprintf('Variable %s is missing', $variableName));
     }
 

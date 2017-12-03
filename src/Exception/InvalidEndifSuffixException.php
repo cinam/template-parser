@@ -5,9 +5,17 @@ namespace Cinam\TemplateParser\Exception;
 class InvalidEndifSuffixException extends \Exception
 {
 
-    public function __construct()
+    private $context;
+
+    public function __construct($context)
     {
+        $this->context = $context;
         parent::__construct('Invalid ENDIF suffix');
+    }
+
+    public function getContext()
+    {
+        return $this->context;
     }
 }
 
