@@ -40,6 +40,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     public function providerStandard()
     {
         return [
+            ['{var1}', ['var1' => 1], '1'],
             ['begin {var1} end', ['var1' => 1], 'begin 1 end'],
             ['begin {var1} {var1} end', ['var1' => 1], 'begin 1 1 end'],
             ['begin {var1} {var2} end', ['var1' => 1, 'var2' => 2], 'begin 1 2 end'],
@@ -64,7 +65,6 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['{var1}', ['var1' => 1], '1'],
             ['{var1}{var1}', ['var1' => 1], '11'],
             ['{var1}middle{var1}', ['var1' => 1], '1middle1'],
-            ['foo{var1}bar{var2}baz', [], 'foo{var1}bar{var2}baz'],
         ];
     }
 
@@ -131,6 +131,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['begin end', [], 'begin end'],
 
             // one table without variables
+            ['[START table1][END]', ['table1' => []], ''],
             ['begin [START table1]foo [END] end', ['table1' => []], 'begin  end'],
             ['begin [START table1]foo [END] end', ['table1' => [[], [], []]], 'begin foo foo foo  end'],
 
@@ -259,6 +260,48 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
                 '[IF var1][ENDIF][IF 1][ENDIF][IF a][ENDIF][IF b][ENDIF][IF 2][ENDIF][IF e][ENDIF][IF f][ENDIF]'
             ],
         ];
+    }
+
+    /**
+     * @dataProvider providerStandardMissingVariable
+     * @expectedException Cinam\TemplateParser\Exception\MissingVariableException
+     */
+    public function testStandardMissingVariable($input, $variables)
+    {
+        $this->parser->parseStandard($input, $variables);
+    }
+
+    public function providerStandardMissingVariable()
+    {
+        return [
+            ['{var1}', []],
+            ['{var1}', ['VAR1']],
+        ];
+    }
+
+    /**
+     * @dataProvider providerTableMissingVariable
+     * @expectedException Cinam\TemplateParser\Exception\MissingVariableException
+     */
+    public function testTableMissingVariable($input, $variables)
+    {
+        $this->parser->parseTables($input, $variables);
+    }
+
+    public function providerTableMissingVariable()
+    {
+        return [
+            ['[START table1][END]', []],
+            ['[START table1][END]', ['TABLE1' => []]],
+        ];
+    }
+
+    /**
+     * @expectedException Cinam\TemplateParser\Exception\InvalidTableVariableException
+     */
+    public function testTableInvalidVariable()
+    {
+        $this->parser->parseTables('[START table1][END]', ['table1' => 'foo']);
     }
 }
 

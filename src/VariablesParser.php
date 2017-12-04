@@ -3,7 +3,7 @@
 namespace Cinam\TemplateParser;
 
 use Cinam\TemplateParser\Exception\InvalidSyntaxException;
-use Cinam\TemplateParser\Exception\MissingTableVariableException;
+use Cinam\TemplateParser\Exception\MissingVariableException;
 use Cinam\TemplateParser\Exception\InvalidTableVariableException;
 use Cinam\TemplateParser\Exception\InvalidEndSuffixException;
 
@@ -41,12 +41,11 @@ class VariablesParser
             if ($variableStart !== false && $variableEnd !== false) {
                 $variableName = substr($text, $variableStart + 1, $variableEnd - $variableStart - 1);
                 if ($this->isCorrectVariableName($variableName)) {
-                    if (array_key_exists($variableName, $variables)) {
-                        $result .= substr($text, $currentIndex, $variableStart - $currentIndex) . $variables[$variableName];
-                    } else {
-                        $result .= substr($text, $currentIndex, $variableEnd - $currentIndex + 1);
+                    if (!array_key_exists($variableName, $variables)) {
+                        throw new MissingVariableException($variableName);
                     }
 
+                    $result .= substr($text, $currentIndex, $variableStart - $currentIndex) . $variables[$variableName];
                     $currentIndex = $variableEnd + 1;
                 } else {
                     $result .= $text[$currentIndex];
@@ -170,7 +169,7 @@ class VariablesParser
         // 7 = strlen('[TABLE ')
         $tableIdentifier = substr($text, 7, strpos($text, ']') - 7);
         if (!array_key_exists($tableIdentifier, $variables)) {
-            throw new MissingTableVariableException($tableIdentifier);
+            throw new MissingVariableException($tableIdentifier);
         } elseif (!is_array($variables[$tableIdentifier])) {
             throw new InvalidTableVariableException($tableIdentifier);
         }

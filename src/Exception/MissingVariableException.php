@@ -2,14 +2,14 @@
 
 namespace Cinam\TemplateParser\Exception;
 
-class MissingTableVariableException extends \Exception
+class MissingVariableException extends \Exception
 {
 
     private $variableName;
 
     public function __construct($variableName)
     {
-        $this->variableName - $variableName;
+        $this->variableName = $variableName;
         parent::__construct(sprintf('Variable %s is missing', $variableName));
     }
 
