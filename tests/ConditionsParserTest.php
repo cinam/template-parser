@@ -142,6 +142,9 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 1 2]foo[ENDIF]'],
             ['[IF 1 <]foo[ENDIF]'],
             ['[IF 1 < 2 3]foo[ENDIF]'],
+
+            ['[IF 1]foo[ENDIF ]'],
+            ['[IF 1]foo[ENDIF bar]'],
         ];
     }
 
@@ -241,51 +244,6 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
 
             ['[IF var1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1, 'var2' => 1], 'yes'],
             ['[IF var1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1, 'var2' => 2], 'no'],
-        ];
-    }
-
-    /**
-     * @dataProvider providerExtendedENDIF
-     */
-    public function testExtendedENDIF($input, $expected)
-    {
-        $this->assertEquals($expected, $this->parser->parse($input));
-    }
-
-    public function providerExtendedENDIF()
-    {
-        return [
-            ['[IF 1]foo[ENDIF bar]', 'foo'],
-            ['[IF 0]foo[ENDIF baz_1]', ''],
-
-            ['[IF 1]foo[ELSE]bar[ENDIF bar]', 'foo'],
-            ['[IF 0]foo[ELSE]bar[ENDIF baz_1]', 'bar'],
-
-            ['[IF 1]foo[ENDIF foo] [IF 1]bar[ENDIF bar]', 'foo bar'],
-            ['[IF 0]foo[ENDIF foo] [IF 0]bar[ENDIF bar]', ' '],
-
-            ['start [IF 0]foo[ELSE][IF 1]bar[ELSE]baz[ENDIF bar_1][ENDIF baz_1] end', 'start bar end'],
-            ['[IF 1]foo[ENDIF 12345678901234567890123456789012345678901234567890]', 'foo'],
-        ];
-    }
-
-    /**
-     * @dataProvider providerInvalidEndifSuffix
-     * @expectedException Cinam\TemplateParser\Exception\InvalidEndifSuffixException
-     */
-    public function testEndifSuffixError($input)
-    {
-        $this->parser->parse($input);
-    }
-
-    public function providerInvalidEndifSuffix()
-    {
-        return [
-            // double suffix
-            ['[IF 1]foo[ENDIF bar baz]'],
-
-            // 51 chars
-            ['[IF 1]foo[ENDIF 123456789012345678901234567890123456789012345678901]'],
         ];
     }
 }

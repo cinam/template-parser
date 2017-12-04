@@ -3,17 +3,14 @@
 namespace Cinam\TemplateParser;
 
 use Cinam\TemplateParser\Exception\InvalidSyntaxException;
-use Cinam\TemplateParser\Exception\InvalidEndifSuffixException;
 
 class ConditionsParser
 {
 
-    const MAX_ENDIF_SUFFIX_LENGTH = 50;
-
     public function parse($text, array $variables = [])
     {
         // can it be removed?
-        if (strpos($text, '[IF ') === false && strpos($text, '[ENDIF') === false) {
+        if (strpos($text, '[IF ') === false && strpos($text, '[ENDIF]') === false) {
             return $text;
         }
 
@@ -42,7 +39,7 @@ class ConditionsParser
     {
         $ifPosition = 0;
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
-        $endifPosition = strrpos($text, '[ENDIF'); // strRpos
+        $endifPosition = strrpos($text, '[ENDIF]'); // strRpos
 
         // strlen('[IF ') = 4
         $condition = substr($text, $ifPosition + 4, $ifContentPosition - 1 - $ifPosition - 4);
@@ -85,17 +82,6 @@ class ConditionsParser
 
                 if ($currentDepth === 0) {
                     $ends[] = $i + 6; // last letter of "[ENDIF]"
-                }
-            } elseif (substr($text, $i, 7) === '[ENDIF ') {
-                $endingPosition = strpos($text, ']', $i + 7);
-                if ($endingPosition !== false) {
-                    $suffix = substr($text, $i + 7, $endingPosition - $i - 7);
-                    $this->checkEndifSuffix($suffix);
-
-                    -- $currentDepth;
-                    if ($currentDepth === 0) {
-                        $ends[] = $endingPosition; // last letter of "[ENDIF ...]"
-                    }
                 }
             } elseif (substr($text, $i, 6) === '[ELSE]') {
                 if ($currentDepth === 1) {
@@ -169,13 +155,6 @@ class ConditionsParser
             } else {
                 throw new InvalidSyntaxException();
             }
-        }
-    }
-
-    private function checkEndifSuffix($text)
-    {
-        if (!(strlen($text) <= self::MAX_ENDIF_SUFFIX_LENGTH && preg_match('#^[[:alnum:]_]+$#', $text))) {
-            throw new InvalidEndifSuffixException($text);
         }
     }
 }
