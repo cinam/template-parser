@@ -48,6 +48,7 @@ echo $parser->parse($text, ['score' => 50, 'highScore' => 60]);
 echo $parser->parse($text, ['score' => 50, 'highScore' => 40]);
 ```
 *Your score: 50 points.*
+
   *Congratulations, it's the new high score!*
 
 ### Example 3 - Condition with ELSE
@@ -95,7 +96,10 @@ $parser = new \Cinam\TemplateParser\Parser();
 echo $parser->parse($text, $variables);
 ```
 *Summary:*
+
   *Peter, your score is 20.*
+
   *Mike, your score is 30.*
+
   *John, your score is 30. Congratulations, it's your personal best!*
 
