@@ -18,10 +18,10 @@ class Parser
      */
     private $conditionsParser;
 
-    public function __construct(VariablesParser $variablesParser, ConditionsParser $conditionsParser)
+    public function __construct()
     {
-        $this->variablesParser = $variablesParser;
-        $this->conditionsParser = $conditionsParser;
+        $this->variablesParser = new VariablesParser();
+        $this->conditionsParser = new ConditionsParser();
     }
 
     public function parse($text, array $variables)

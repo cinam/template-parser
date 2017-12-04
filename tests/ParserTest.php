@@ -3,8 +3,6 @@
 namespace Cinam\TemplateParser\Tests;
 
 use Cinam\TemplateParser\Parser;
-use Cinam\TemplateParser\VariablesParser;
-use Cinam\TemplateParser\ConditionsParser;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,7 +16,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->parser = new Parser(new VariablesParser(), new ConditionsParser());
+        $this->parser = new Parser();
     }
 
     public function tearDown()
