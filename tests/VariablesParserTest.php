@@ -64,6 +64,7 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
             ['{var1}', ['var1' => 1], '1'],
             ['{var1}{var1}', ['var1' => 1], '11'],
             ['{var1}middle{var1}', ['var1' => 1], '1middle1'],
+            ['foo{var1}bar{var2}baz', [], 'foo{var1}bar{var2}baz'],
         ];
     }
 

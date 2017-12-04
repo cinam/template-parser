@@ -44,7 +44,7 @@ class VariablesParser
                     if (array_key_exists($variableName, $variables)) {
                         $result .= substr($text, $currentIndex, $variableStart - $currentIndex) . $variables[$variableName];
                     } else {
-                        $result .= substr($text, $currentIndex, $variableEnd - $currentIndex);
+                        $result .= substr($text, $currentIndex, $variableEnd - $currentIndex + 1);
                     }
 
                     $currentIndex = $variableEnd + 1;
