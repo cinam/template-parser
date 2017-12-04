@@ -5,14 +5,11 @@ namespace Cinam\TemplateParser;
 use Cinam\TemplateParser\Exception\InvalidSyntaxException;
 use Cinam\TemplateParser\Exception\MissingVariableException;
 use Cinam\TemplateParser\Exception\InvalidTableVariableException;
-use Cinam\TemplateParser\Exception\InvalidEndSuffixException;
 
 class VariablesParser
 {
 
     const MAX_IDENTIFIER_LENGTH = 50;
-
-    const MAX_END_SUFFIX_LENGTH = 50;
 
     public function parseStandard($text, array $variables)
     {
@@ -150,7 +147,7 @@ class VariablesParser
     private function parseTable($text, array $variables)
     {
         $tableContentPosition = strpos($text, ']') + 1;
-        $tableEndPosition = strrpos($text, '[END'); // strRpos
+        $tableEndPosition = strrpos($text, '[END]'); // strRpos
         $tableIdentifier = $this->getTableIdentifier($text, $variables);
 
         $result = '';
@@ -197,17 +194,6 @@ class VariablesParser
                 if ($currentDepth === 0) {
                     $ends[] = $i + 4; // last letter of "[END]"
                 }
-            } elseif (substr($text, $i, 5) === '[END ') {
-                $endingPosition = strpos($text, ']', $i + 5);
-                if ($endingPosition !== false) {
-                    $suffix = substr($text, $i + 5, $endingPosition - $i - 5);
-                    $this->checkEndSuffix($suffix);
-
-                    -- $currentDepth;
-                    if ($currentDepth === 0) {
-                        $ends[] = $endingPosition; // last letter of "[END ...]"
-                    }
-                }
             }
 
             if ($currentDepth < 0) {
@@ -223,12 +209,5 @@ class VariablesParser
             $starts,
             $ends,
         ];
-    }
-
-    private function checkEndSuffix($text)
-    {
-        if (!(strlen($text) <= self::MAX_END_SUFFIX_LENGTH && preg_match('#^[[:alnum:]_]+$#', $text))) {
-            throw new InvalidEndSuffixException($text);
-        }
     }
 }

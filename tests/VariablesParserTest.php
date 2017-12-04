@@ -156,40 +156,20 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider providerExtendedEND
+     * @dataProvider providerTableSyntaxError
+     * @expectedException Cinam\TemplateParser\Exception\InvalidSyntaxException
      */
-    public function testExtendedEND($input, $variables, $expected)
-    {
-        $this->assertEquals($expected, $this->parser->parseTables($input, $variables));
-    }
-
-    public function providerExtendedEND()
-    {
-        return [
-            ['begin [START table1]foo [END table1]end', ['table1' => [[]]], 'begin foo end'],
-            ['begin [START table1]foo [END table1][START table2]bar [END tableX]end', ['table1' => [[]], 'table2' => [[]]], 'begin foo bar end'],
-            ['[START table1]foo[END another_suffix]', ['table1' => [[]]], 'foo'],
-            ['[START table1]foo[END 12345678901234567890123456789012345678901234567890]', ['table1' => [[]]], 'foo'],
-        ];
-    }
-
-    /**
-     * @dataProvider providerInvalidEndSuffix
-     * @expectedException Cinam\TemplateParser\Exception\InvalidEndSuffixException
-     */
-    public function testEndSuffixError($input)
+    public function testTableSyntaxError($input)
     {
         $this->parser->parseTables($input, []);
     }
 
-    public function providerInvalidEndSuffix()
+    public function providerTableSyntaxError()
     {
         return [
-            // double suffix
-            ['[START table1]foo [END table1 bar]'],
-
-            // 51 chars
-            ['[START table1]foo [END 123456789012345678901234567890123456789012345678901]'],
+            ['[START table1]'],
+            ['[START table1][END ]'],
+            ['[START table1][END foo]'],
         ];
     }
 
