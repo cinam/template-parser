@@ -97,7 +97,12 @@ class VariablesParser
 
         if ($this->isCorrectVariableName($parts[0])) {
             if (array_key_exists($parts[0], $variables)) {
-                $result .= $variables[$parts[0]];
+                $value = $variables[$parts[0]];
+                if ($value === null) {
+                    $value = 'NULL';
+                }
+
+                $result .= $value;
             } else {
                 $result .= $parts[0];
             }
@@ -110,7 +115,12 @@ class VariablesParser
 
             if ($this->isCorrectVariableName($parts[2])) {
                 if (array_key_exists($parts[2], $variables)) {
-                    $result .= $variables[$parts[2]];
+                    $value = $variables[$parts[2]];
+                    if ($value === null) {
+                        $value = 'NULL';
+                    }
+
+                    $result .= $value;
                 } else {
                     $result .= $parts[2];
                 }
