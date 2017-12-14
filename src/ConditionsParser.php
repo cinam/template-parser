@@ -138,16 +138,22 @@ class ConditionsParser
                     $var1 = $parts[0];
                 } elseif (array_key_exists($parts[0], $variables)) {
                     $var1 = $variables[$parts[0]];
+                    if ($var1 === null) {
+                        $var1 = 'NULL';
+                    }
                 } else {
-                    $var1 = 'null';
+                    $var1 = 'NULL';
                 }
 
                 if (is_numeric($parts[2])) {
                     $var2 = $parts[2];
                 } elseif (array_key_exists($parts[2], $variables)) {
                     $var2 = $variables[$parts[2]];
+                    if ($var2 === null) {
+                        $var2 = 'NULL';
+                    }
                 } else {
-                    $var2 = 'null';
+                    $var2 = 'NULL';
                 }
 
                 // todo remove "eval"
