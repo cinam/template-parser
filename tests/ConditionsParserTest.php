@@ -223,32 +223,43 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider providerConditionWithVariables
+     * @dataProvider providerStringCondition
      */
-    public function testConditionWithVariables($input, array $variables, $expected)
+    public function testStringCondition($input, $expected)
     {
-        $this->assertEquals($expected, $this->parser->parse($input, $variables));
+        $this->assertEquals($expected, $this->parser->parse($input));
     }
 
-    public function providerConditionWithVariables()
+    public function providerStringCondition()
     {
         return [
-            ['[IF 1 == var1]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
-            ['[IF 1 == var1]yes[ELSE]no[ENDIF]', ['var1' => 2], 'no'],
-            ['[IF 1 == var1]yes[ELSE]no[ENDIF]', [], 'no'],
-            ['[IF 0 == var1]yes[ELSE]no[ENDIF]', [], 'yes'], // 0 == null
-            ['[IF 1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1], 'no'],
+            ['[IF foo]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF foo != null]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF foo == null]yes[ELSE]no[ENDIF]', 'no'],
+        ];
+    }
 
-            ['[IF var1 == 1]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
-            ['[IF var1 == 1]yes[ELSE]no[ENDIF]', ['var1' => 2], 'no'],
+    /**
+     * @dataProvider providerNullCondition
+     */
+    public function testNullCondition($input, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($input));
+    }
 
-            ['[IF var1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1, 'var2' => 1], 'yes'],
-            ['[IF var1 == var2]yes[ELSE]no[ENDIF]', ['var1' => 1, 'var2' => 2], 'no'],
-
-            // nuls
-            ['[IF 1 != NULL]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
-            ['[IF var1 != NULL]yes[ELSE]no[ENDIF]', ['var1' => 1], 'yes'],
-            ['[IF var1 != NULL]yes[ELSE]no[ENDIF]', ['var1' => null], 'no'],
+    public function providerNullCondition()
+    {
+        return [
+            ['[IF null]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF NULL]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF null == null]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF null == NULL]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF NULL == null]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF NULL == NULL]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF null != null]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF null != NULL]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF NULL != null]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF NULL != NULL]yes[ELSE]no[ENDIF]', 'no'],
         ];
     }
 }

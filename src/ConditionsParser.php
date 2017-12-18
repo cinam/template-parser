@@ -7,7 +7,7 @@ use Cinam\TemplateParser\Exception\InvalidSyntaxException;
 class ConditionsParser
 {
 
-    public function parse($text, array $variables = [])
+    public function parse($text)
     {
         // can it be removed?
         if (strpos($text, '[IF ') === false && strpos($text, '[ENDIF]') === false) {
@@ -26,8 +26,7 @@ class ConditionsParser
             // search for an else between current if and endif
             $elseIndex = $this->getElseIndex($elseStarts, $ifStarts[$i], $ifEnds[$i]);
 
-            // todo stop passing $variables over and over
-            $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1), $elseIndex, $variables);
+            $result .= $this->getConditionResult(substr($text, $ifStarts[$i], $ifEnds[$i] - $ifStarts[$i] + 1), $elseIndex);
             $nextIf = (isset($ifStarts[$i + 1]) ? $ifStarts[$i + 1] : strlen($text) + 1);
             $result .= substr($text, $ifEnds[$i] + 1, $nextIf - $ifEnds[$i] - 1);
         }
@@ -35,7 +34,7 @@ class ConditionsParser
         return $result;
     }
 
-    private function getConditionResult($text, $elseIndex, array $variables)
+    private function getConditionResult($text, $elseIndex)
     {
         $ifPosition = 0;
         $ifContentPosition = strpos($text, ']', $ifPosition + 1) + 1;
@@ -45,7 +44,7 @@ class ConditionsParser
         $condition = substr($text, $ifPosition + 4, $ifContentPosition - 1 - $ifPosition - 4);
 
         $result = '';
-        if ($this->evaluateCondition($condition, $variables)) {
+        if ($this->evaluateCondition($condition)) {
             // content ending with position of else or endif
             if ($elseIndex !== null) {
                 $result = substr($text, $ifContentPosition, $elseIndex - $ifContentPosition);
@@ -59,7 +58,7 @@ class ConditionsParser
             }
         }
 
-        return $this->parse($result, $variables);
+        return $this->parse($result);
     }
 
     private function getIfIndexesForCurrentDepth($text)
@@ -122,7 +121,7 @@ class ConditionsParser
         return $elseIndex;
     }
 
-    private function evaluateCondition($text, array $variables)
+    private function evaluateCondition($text)
     {
         $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
         if (count($parts) !== 1 && count($parts) !== 3) {
@@ -130,31 +129,12 @@ class ConditionsParser
         }
 
         if (count($parts) === 1) {
-            return (boolean) $parts[0];
+            return (strtolower($parts[0]) !== 'null' && (boolean) $parts[0] === true);
         } else {
             $operator = $parts[1];
             if (in_array($operator, ['==', '<', '>', '<=', '>=', '!=', '<>'])) {
-                if (is_numeric($parts[0])) {
-                    $var1 = $parts[0];
-                } elseif (array_key_exists($parts[0], $variables)) {
-                    $var1 = $variables[$parts[0]];
-                    if ($var1 === null) {
-                        $var1 = 'NULL';
-                    }
-                } else {
-                    $var1 = 'NULL';
-                }
-
-                if (is_numeric($parts[2])) {
-                    $var2 = $parts[2];
-                } elseif (array_key_exists($parts[2], $variables)) {
-                    $var2 = $variables[$parts[2]];
-                    if ($var2 === null) {
-                        $var2 = 'NULL';
-                    }
-                } else {
-                    $var2 = 'NULL';
-                }
+                $var1 = $this->createVariable($parts[0]);
+                $var2 = $this->createVariable($parts[2]);
 
                 // todo remove "eval"
                 return eval(sprintf('return (%s %s %s);', $var1, $operator, $var2));
@@ -162,5 +142,18 @@ class ConditionsParser
                 throw new InvalidSyntaxException();
             }
         }
+    }
+
+    private function createVariable($value)
+    {
+        if (is_numeric($value)) {
+            $result = $value;
+        } elseif (strtolower($value) === 'null') {
+            $result = 'NULL';
+        } else {
+            $result = "'" . str_replace("'", "\\'", $value) . "'";
+        }
+
+        return $result;
     }
 }
