@@ -136,6 +136,12 @@ class ConditionsParser
                 $var1 = $this->createVariable($parts[0]);
                 $var2 = $this->createVariable($parts[2]);
 
+                if ($operator == '==') {
+                    $operator = '===';
+                } elseif ($operator == '!=') {
+                    $operator = '!==';
+                }
+
                 // todo remove "eval"
                 return eval(sprintf('return (%s %s %s);', $var1, $operator, $var2));
             } else {
