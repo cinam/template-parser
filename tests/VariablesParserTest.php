@@ -117,6 +117,30 @@ class VariablesParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider providerStringVariableInConditions
+     */
+    public function testStringVariableInConditions($input, $variables, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parseStandard($input, $variables));
+    }
+
+    public function providerStringVariableInConditions()
+    {
+        return [
+            ['[IF var1]', ['var1' => 'foo'], '[IF foo]'],
+            ['[IF var1 == 5]', ['var1' => 'foo'], '[IF foo == 5]'],
+            ['[IF 5 == var1]', ['var1' => 'foo'], '[IF 5 == foo]'],
+            ['[IF var1 == var1]', ['var1' => 'foo'], '[IF foo == foo]'],
+            ['[IF var1 == var2]', ['var1' => 'foo', 'var2' => 'bar'], '[IF foo == bar]'],
+
+            ['[IF var1]', ['var1' => 'foo bar'], '[IF foo bar]'],
+            ['[IF var1]', ['var1' => 'foo bar  baz'], '[IF foo bar  baz]'],
+            ['[IF var1 == 5]', ['var1' => 'foo bar'], '[IF foo bar == 5]'],
+            ['[IF 5 == var1]', ['var1' => 'foo bar'], '[IF 5 == foo bar]'],
+        ];
+    }
+
+    /**
      * @dataProvider providerSimpleTable
      */
     public function testSimpleTable($input, $variables, $expected)

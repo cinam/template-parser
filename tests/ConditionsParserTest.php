@@ -141,7 +141,8 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 1]foo[ELSE]bar[ELSE]baz[ENDIF]'],
             ['[IF 1 2]foo[ENDIF]'],
             ['[IF 1 <]foo[ENDIF]'],
-            ['[IF 1 < 2 3]foo[ENDIF]'],
+            ['[IF 1 2 <]foo[ENDIF]'],
+            ['[IF < 1 2]foo[ENDIF]'],
 
             ['[IF 1]foo[ENDIF ]'],
             ['[IF 1]foo[ENDIF bar]'],
@@ -236,6 +237,11 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF foo]yes[ELSE]no[ENDIF]', 'yes'],
             ['[IF foo != null]yes[ELSE]no[ENDIF]', 'yes'],
             ['[IF foo == null]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF foo bar != null]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF null != foo bar]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF foo bar baz != null]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF foo bar == baz]yes[ELSE]no[ENDIF]', 'no'],
+            ['[IF foo bar == foo bar]yes[ELSE]no[ENDIF]', 'yes'],
         ];
     }
 

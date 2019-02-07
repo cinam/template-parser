@@ -7,6 +7,8 @@ use Cinam\TemplateParser\Exception\InvalidSyntaxException;
 class ConditionsParser
 {
 
+    const OPERATORS = ['==', '<', '>', '<=', '>=', '!=', '<>'];
+
     public function parse($text)
     {
         // can it be removed?
@@ -124,30 +126,62 @@ class ConditionsParser
     private function evaluateCondition($text)
     {
         $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
-        if (count($parts) !== 1 && count($parts) !== 3) {
-            throw new InvalidSyntaxException($text);
-        }
 
         if (count($parts) === 1) {
             return (strtolower($parts[0]) !== 'null' && (boolean) $parts[0] === true);
+        } elseif (in_array(count($parts), [0, 2])) {
+            throw new InvalidSyntaxException($text);
         } else {
-            $operator = $parts[1];
-            if (in_array($operator, ['==', '<', '>', '<=', '>=', '!=', '<>'])) {
-                $var1 = $this->createVariable($parts[0]);
-                $var2 = $this->createVariable($parts[2]);
+            // 3 parts or more
+            $operatorIndex = $this->findOperatorIndex($parts, $text);
+            $operator = $parts[$operatorIndex];
 
-                if ($operator == '==') {
-                    $operator = '===';
-                } elseif ($operator == '!=') {
-                    $operator = '!==';
+            $left = $parts[0];
+            for ($i = 1; $i < $operatorIndex; $i++) {
+                $left .= ' ' . $parts[$i];
+            }
+
+            $right = $parts[$operatorIndex + 1];
+            for ($i = $operatorIndex + 2; $i < count($parts); $i++) {
+                $right .= ' ' . $parts[$i];
+            }
+
+            $var1 = $this->createVariable($left);
+            $var2 = $this->createVariable($right);
+
+            if ($operator == '==') {
+                $operator = '===';
+            } elseif ($operator == '!=') {
+                $operator = '!==';
+            }
+
+            // todo remove "eval"
+            return eval(sprintf('return (%s %s %s);', $var1, $operator, $var2));
+        }
+    }
+
+    private function findOperatorIndex($parts, $text)
+    {
+        $result = null;
+
+        // it cannot be first or last
+        for ($i = 1; $i < count($parts) - 1; $i++) {
+            if (in_array($parts[$i], self::OPERATORS)) {
+                if ($result !== null) {
+                    // more than one operator
+                    throw new InvalidSyntaxException($text);
+                } else {
+                    $result = $i;
                 }
-
-                // todo remove "eval"
-                return eval(sprintf('return (%s %s %s);', $var1, $operator, $var2));
-            } else {
-                throw new InvalidSyntaxException();
             }
         }
+
+        if ($result === null) {
+            // operator not found
+            throw new InvalidSyntaxException($text);
+        }
+
+        return $result;
     }
 
     private function createVariable($value)
