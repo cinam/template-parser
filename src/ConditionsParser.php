@@ -186,7 +186,7 @@ class ConditionsParser
 
     private function createVariable($value)
     {
-        if (is_numeric($value)) {
+        if ($this->isCorrectNumber($value)) {
             $result = $value;
         } elseif (strtolower($value) === 'null') {
             $result = 'NULL';
@@ -195,5 +195,23 @@ class ConditionsParser
         }
 
         return $result;
+    }
+
+    function isOctal($x)
+    {
+        return decoct(octdec($x)) == $x;
+    }
+
+    function isCorrectNumber($value)
+    {
+        if (is_numeric($value)) {
+            if ($value[0] == 0 && !$this->isOctal($value)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
