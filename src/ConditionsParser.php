@@ -197,12 +197,12 @@ class ConditionsParser
         return $result;
     }
 
-    function isOctal($x)
+    private function isOctal($x)
     {
         return decoct(octdec($x)) == $x;
     }
 
-    function isCorrectNumber($value)
+    private function isCorrectNumber($value)
     {
         if (is_numeric($value)) {
             if ($value[0] == 0 && !$this->isOctal($value)) {
