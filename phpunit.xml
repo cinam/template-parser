@@ -6,9 +6,16 @@
     debug = "true"
     bootstrap ="vendor/autoload.php"
     >
+
+    <testsuites>
+        <testsuite name="all">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
     <filter>
       <whitelist>
         <directory suffix=".php">src</directory>
       </whitelist>
     </filter>
+
 </phpunit>
