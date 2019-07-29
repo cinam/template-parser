@@ -125,26 +125,17 @@ class ConditionsParser
 
     private function evaluateCondition($text)
     {
-        $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $text = trim($text);
+        $split = $this->splitCondition($text);
+        // split has one (IF ...) or three elements (IF ... OPERATOR ...)
 
-        if (count($parts) === 1) {
-            return (strtolower($parts[0]) !== 'null' && (boolean) $parts[0] === true);
-        } elseif (in_array(count($parts), [0, 2])) {
-            throw new InvalidSyntaxException($text);
+        if (count($split) === 1) {
+            return (strtolower($split[0]) !== 'null' && (boolean) $split[0] === true);
         } else {
-            // 3 parts or more
-            $operatorIndex = $this->findOperatorIndex($parts, $text);
-            $operator = $parts[$operatorIndex];
+            $operator = $split[1];
 
-            $left = $parts[0];
-            for ($i = 1; $i < $operatorIndex; $i++) {
-                $left .= ' ' . $parts[$i];
-            }
-
-            $right = $parts[$operatorIndex + 1];
-            for ($i = $operatorIndex + 2; $i < count($parts); $i++) {
-                $right .= ' ' . $parts[$i];
-            }
+            $left = $split[0];
+            $right = $split[2];
 
             $var1 = $this->createVariable($left);
             $var2 = $this->createVariable($right);
@@ -160,25 +151,35 @@ class ConditionsParser
         }
     }
 
-    private function findOperatorIndex($parts, $text)
+    private function splitCondition($text)
     {
-        $result = null;
+        $parts = preg_split('#\s#', $text, -1, PREG_SPLIT_NO_EMPTY);
 
-        // it cannot be first or last
-        for ($i = 1; $i < count($parts) - 1; $i++) {
+        $operatorIndex = null;
+        for ($i = 0; $i < count($parts); $i++) {
             if (in_array($parts[$i], self::OPERATORS)) {
-                if ($result !== null) {
+                if ($operatorIndex !== null) {
                     // more than one operator
                     throw new InvalidSyntaxException($text);
                 } else {
-                    $result = $i;
+                    $operatorIndex = $i;
                 }
             }
         }
 
-        if ($result === null) {
-            // operator not found
+        // it cannot be first or last
+        if ($operatorIndex === 0 || $operatorIndex === count($parts) - 1) {
             throw new InvalidSyntaxException($text);
+        }
+
+        if ($operatorIndex === null) {
+            $result = [$text];
+        } else {
+            $result = [
+                implode(' ', array_slice($parts, 0, $operatorIndex)),
+                $parts[$operatorIndex],
+                implode(' ', array_slice($parts, $operatorIndex + 1)),
+            ];
         }
 
         return $result;
