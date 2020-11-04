@@ -279,6 +279,7 @@ class ConditionsParserTest extends \PHPUnit\Framework\TestCase
             ['[IF 0 != NULL]yes[ELSE]no[ENDIF]', 'yes'],
             ['[IF 08 != NULL]yes[ELSE]no[ENDIF]', 'yes'],
             ['[IF 0xG != NULL]yes[ELSE]no[ENDIF]', 'yes'],
+            ['[IF -1 != NULL]yes[ELSE]no[ENDIF]', 'yes'],
         ];
     }
 }

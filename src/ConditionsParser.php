@@ -200,7 +200,7 @@ class ConditionsParser
 
     private function isOctal($x)
     {
-        return decoct(octdec($x)) == $x;
+        return sprintf('%o', $x) == $x;
     }
 
     private function isCorrectNumber($value)
